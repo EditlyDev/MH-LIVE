@@ -2,83 +2,445 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MH LIVE ESPORTES</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#050A14"/>
+  <title>Site Moving | Avinash Web App Services</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #050A14;
+      --surface: #0D1626;
+      --border: rgba(99,179,255,0.15);
+      --accent: #3B9EFF;
+      --accent2: #00F0C8;
+      --text: #E8F1FF;
+      --muted: #7A9BBF;
+      --glow: rgba(59,158,255,0.3);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+    }
+
+    html {
+      height: 100%;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      min-height: 100%;
+      min-height: 100dvh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: pan-y;
+    }
+
+    /* ── Starfield ── */
+    #stars {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+      width: 100%; height: 100%;
+    }
+
+    /* ── Grid lines ── */
+    .grid {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(59,158,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,158,255,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* ── Corner decorations ── */
+    .corner {
+      position: fixed;
+      width: 80px; height: 80px;
+      pointer-events: none; z-index: 1;
+    }
+    .corner.tl { top: 0; left: 0; border-top: 1px solid rgba(59,158,255,0.2); border-left: 1px solid rgba(59,158,255,0.2); border-radius: 0 0 40px 0; }
+    .corner.br { bottom: 0; right: 0; border-bottom: 1px solid rgba(59,158,255,0.2); border-right: 1px solid rgba(59,158,255,0.2); border-radius: 40px 0 0 0; }
+
+    /* ── Center stage ── */
+    .stage {
+      position: relative; z-index: 10;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 100dvh;
+      padding: clamp(1.2rem, 5vw, 2.5rem);
+      padding-top: calc(clamp(1.2rem, 5vw, 2.5rem) + var(--safe-top));
+      padding-bottom: calc(clamp(1.2rem, 5vw, 2.5rem) + var(--safe-bottom));
+      gap: clamp(1.5rem, 4vw, 2.5rem);
+    }
+
+    /* ── Orbit ring ── */
+    .orbit-wrap {
+      position: relative;
+      width: clamp(150px, 38vw, 220px);
+      height: clamp(150px, 38vw, 220px);
+      flex-shrink: 0;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
+    }
+
+    .orbit-ring {
+      position: absolute; inset: 0;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      animation: spin 8s linear infinite;
+    }
+    .orbit-ring::before {
+      content: '';
+      position: absolute;
+      top: -5px; left: 50%;
+      transform: translateX(-50%);
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px 4px var(--glow);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .orbit-ring.outer {
+      inset: -18px;
+      animation-duration: 14s;
+      animation-direction: reverse;
+      border-color: rgba(0,240,200,0.12);
+    }
+    .orbit-ring.outer::before { background: var(--accent2); box-shadow: 0 0 12px 4px rgba(0,240,200,0.4); }
+
+    .globe {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .globe svg {
+      width: clamp(64px, 16vw, 90px);
+      height: clamp(64px, 16vw, 90px);
+      filter: drop-shadow(0 0 18px rgba(59,158,255,0.55));
+      animation: pulseSvg 3s ease-in-out infinite;
+    }
+    @keyframes pulseSvg {
+      0%,100% { filter: drop-shadow(0 0 18px rgba(59,158,255,0.55)); }
+      50%      { filter: drop-shadow(0 0 28px rgba(59,158,255,0.9)); }
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: clamp(14px, 4vw, 22px);
+      padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1.2rem, 5vw, 3rem);
+      max-width: 520px; width: 100%;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(59,158,255,0.08), 0 0 0 1px var(--border);
+      animation: cardIn 0.8s cubic-bezier(0.22,1,0.36,1) both;
+      animation-delay: 0.3s;
+      opacity: 0;
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(59,158,255,0.1);
+      border: 1px solid rgba(59,158,255,0.25);
+      border-radius: 99px;
+      padding: 6px 14px;
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(0.6rem, 2.2vw, 0.7rem);
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: clamp(1rem, 3vw, 1.4rem);
+      white-space: nowrap;
+    }
+    .badge-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      animation: blink 1.2s ease-in-out infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+    /* ── Headline ── */
+    h1 {
+      font-size: clamp(1.3rem, 5.5vw, 2rem);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: clamp(0.75rem, 2.5vw, 1rem);
+      background: linear-gradient(135deg, #E8F1FF 30%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    p {
+      color: var(--muted);
+      font-size: clamp(0.88rem, 3.5vw, 0.97rem);
+      line-height: 1.7;
+      margin-bottom: clamp(1.4rem, 4vw, 2rem);
+    }
+    p strong { color: var(--text); }
+
+    /* ── CTA button — full-width on mobile ── */
+    .btn {
+      display: flex;
+      align-items: center; justify-content: center; gap: 8px;
+      width: 100%;
+      padding: clamp(0.85rem, 3.5vw, 0.9rem) 1.5rem;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), #1a73e8);
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(0.9rem, 3.5vw, 0.95rem);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      border: none; cursor: pointer;
+      box-shadow: 0 4px 24px rgba(59,158,255,0.35);
+      /* Touch responsiveness */
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      min-height: 52px; /* min touch target */
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(59,158,255,0.5);
+    }
+    /* Touch active state */
+    .btn:active, .btn.touch-active {
+      transform: scale(0.97);
+      opacity: 0.88;
+      box-shadow: 0 2px 12px rgba(59,158,255,0.3);
+    }
+
+    /* ── Divider ── */
+    .divider {
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: clamp(1.4rem, 4vw, 2rem) 0 clamp(1.2rem, 3.5vw, 1.6rem);
+    }
+
+    /* ── Progress bar ── */
+    .progress-label {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(0.58rem, 2vw, 0.68rem);
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.55rem;
+      text-align: left;
+      word-break: break-word;
+    }
+    .progress-track {
+      width: 100%; height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: clamp(1.4rem, 4vw, 1.8rem);
+    }
+    .progress-fill {
+      height: 100%; width: 0;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      box-shadow: 0 0 8px rgba(0,240,200,0.5);
+      animation: fillBar 3s cubic-bezier(0.4,0,0.2,1) 1s forwards;
+    }
+    @keyframes fillBar { to { width: 68%; } }
+
+    /* ── Footer brand ── */
+    .brand {
+      display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 6px;
+      font-size: clamp(0.7rem, 2.5vw, 0.78rem);
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      line-height: 1.5;
+    }
+    .brand-icon {
+      width: 22px; height: 22px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.62rem; font-weight: 700;
+      color: #fff; letter-spacing: -0.04em;
+      flex-shrink: 0;
+    }
+    .brand span { color: var(--text); font-weight: 700; }
+
+    /* ── Responsive breakpoints ── */
+    /* Tiny phones (< 360px) */
+    @media (max-width: 359px) {
+      .orbit-wrap { width: 130px; height: 130px; }
+      .orbit-ring.outer { inset: -14px; }
+      .progress-label { font-size: 0.55rem; letter-spacing: 0.04em; }
+    }
+
+    /* Landscape phones */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .stage {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        padding: 1rem clamp(1rem, 5vw, 3rem);
+      }
+      .orbit-wrap {
+        width: 120px; height: 120px;
+        margin-bottom: 0;
+        flex-shrink: 0;
+        animation: float 4s ease-in-out infinite;
+      }
+      .card { max-width: 400px; }
+      h1 { font-size: 1.1rem; }
+      p  { font-size: 0.82rem; margin-bottom: 1rem; }
+    }
+
+    /* Tablets and up */
+    @media (min-width: 640px) {
+      .btn { width: auto; padding: 0.8rem 2.2rem; }
+      .corner { width: 120px; height: 120px; }
+      .corner.tl { border-radius: 0 0 60px 0; }
+      .corner.br { border-radius: 60px 0 0 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+      .card { opacity: 1; }
+    }
+  </style>
 </head>
 <body>
-  <div id="overlay" class="hidden"></div>
 
-  <header>
-    <div class="logo">
-      <img src="logo.jpeg" alt="Logo" class="logo-img" />
-      <span>MH LIVE ESPORTES</span>
+<canvas id="stars"></canvas>
+<div class="grid"></div>
+<div class="corner tl"></div>
+<div class="corner br"></div>
+
+<div class="stage">
+
+  <div class="orbit-wrap">
+    <div class="orbit-ring outer"></div>
+    <div class="orbit-ring"></div>
+    <div class="globe">
+      <svg viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="45" cy="45" r="38" stroke="#3B9EFF" stroke-width="1.5"/>
+        <ellipse cx="45" cy="45" rx="16" ry="38" stroke="#3B9EFF" stroke-width="1.2" opacity="0.5"/>
+        <ellipse cx="45" cy="45" rx="28" ry="38" stroke="#3B9EFF" stroke-width="1" opacity="0.3"/>
+        <ellipse cx="45" cy="34" rx="33" ry="8" stroke="#3B9EFF" stroke-width="1" opacity="0.4"/>
+        <ellipse cx="45" cy="56" rx="33" ry="8" stroke="#3B9EFF" stroke-width="1" opacity="0.4"/>
+        <line x1="7" y1="45" x2="83" y2="45" stroke="#3B9EFF" stroke-width="1.5" opacity="0.6"/>
+        <path d="M30 44 Q45 30 60 44" stroke="#00F0C8" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <polyline points="55,38 60,44 54,49" stroke="#00F0C8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
     </div>
-    <button id="menu-btn" aria-label="Open menu" class="hamburger">&#9776;</button>
-  </header>
-
-  <aside id="sidebar" class="sidebar-closed" aria-hidden="true" role="navigation">
-    <button id="close-btn" aria-label="Close menu" class="close-btn">&times;</button>
-    <nav>
-      <ul>
-        <li><strong style="color:#fff3e0; font-size:1.3rem; margin-bottom:1.5rem; display:block; text-align:center;">Free Fire eSports</strong></li>
-        <li><a href="#register-ff">Register Free Fire</a></li>
-        <li><a href="#schedule">Schedule</a></li>
-        <li><a href="#results">Match Results</a></li>
-        <li><a href="#community">Community</a></li>
-        <li><a href="#teams">Team List</a></li>
-        <li><a href="#stream">Watch Stream</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
-  </aside>
-
-  <main>
-    <section class="hero">
-      <h1>Welcome </h1>
-      <button class="register-btn">Register Now</button>
-    </section>
-
-    <section id="schedule" class="schedule-section">
-      <h2>Upcoming Matches</h2>
-      <table class="schedule-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Map</th>
-            <th>Match Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Na-Na-Na</td>
-            <td>Na</td>
-            <td>Na</td>
-            <td>Na</td>
-          </tr>
-          <tr>
-            <td>Na-Na-Na</td>
-            <td>Na</td>
-            <td>Na</td>
-            <td>Na</td>
-          </tr>
-          <tr>
-            <td>Na-Na-Na</td>
-            <td>Na</td>
-            <td>Na</td>
-            <td>Na</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-  </main>
-<div id="form-popup" class="form-popup hidden">
-  <div class="form-popup-content">
-    <button class="close-form-btn">&times;</button>
-    <div id="jotform-container"></div>
   </div>
+
+  <div class="card">
+    <div class="badge">
+      <div class="badge-dot"></div>
+      Migration in Progress
+    </div>
+
+    <h1>This Site is Moving to a New Address</h1>
+
+    <p>
+      We're upgrading to a better, faster home on the web.
+      To get the new link or any help, please <strong>contact our support team</strong> — we'll get you sorted right away.
+    </p>
+
+    <a class="btn" href="https://t.me/Avinashwebappservices" target="_blank" rel="noopener noreferrer" id="contactBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+      Contact Support
+    </a>
+
+    <div class="divider"></div>
+
+    <div class="progress-label">MIGRATION PROGRESS — PHASE 2 OF 3</div>
+    <div class="progress-track"><div class="progress-fill"></div></div>
+
+    <div class="brand">
+      <div class="brand-icon">AW</div>
+      Powered by <span>Avinash Web App Services</span>
+    </div>
+  </div>
+
 </div>
-  <script src="script.js"></script>
+
+<script>
+  /* ── Touch ripple on button ── */
+  const btn = document.getElementById('contactBtn');
+  btn.addEventListener('touchstart', () => btn.classList.add('touch-active'), { passive: true });
+  btn.addEventListener('touchend',   () => setTimeout(() => btn.classList.remove('touch-active'), 180), { passive: true });
+  btn.addEventListener('touchcancel',() => btn.classList.remove('touch-active'), { passive: true });
+
+  /* ── Starfield ── */
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let W, H, stars = [];
+  let raf;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+
+  // Debounced resize
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 150);
+  });
+
+  // Fewer stars on small screens for performance
+  const count = window.innerWidth < 480 ? 90 : 160;
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      x: Math.random(), y: Math.random(),
+      r: Math.random() * 1.2 + 0.2,
+      a: Math.random(),
+      speed: Math.random() * 0.004 + 0.002
+    });
+  }
+
+  function drawStars() {
+    ctx.clearRect(0, 0, W, H);
+    stars.forEach(s => {
+      s.a += s.speed;
+      const op = 0.1 + Math.abs(Math.sin(s.a)) * 0.6;
+      ctx.beginPath();
+      ctx.arc(s.x * W, s.y * H, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(180,210,255,${op})`;
+      ctx.fill();
+    });
+    raf = requestAnimationFrame(drawStars);
+  }
+
+  // Pause animation when tab is hidden (battery-friendly)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { cancelAnimationFrame(raf); }
+    else { drawStars(); }
+  });
+
+  drawStars();
+</script>
 </body>
 </html>
